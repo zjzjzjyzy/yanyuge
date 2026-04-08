@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>三角洲租号 - 安全交易平台</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%233b82f6'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15h-2v-2h2v2zm0-4h-2V7h2v6z'/%3E%3C/svg%3E">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #0a0c15 0%, #0f111a 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui;
+            color: #f1f5f9;
+            min-height: 100vh;
+        }
+
+        /* 自定义滚动条 */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3b82f6;
+            border-radius: 10px;
+        }
+
+        .app-container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: radial-gradient(circle at 10% 20%, rgba(15, 23, 42, 0.95), rgba(2, 6, 23, 0.98));
+            min-height: 100vh;
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(2px);
+        }
+
+        /* 底部导航栏 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            max-width: 500px;
+            margin: 0 auto;
+            background: rgba(15, 23, 42, 0.92);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(59, 130, 246, 0.3);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 16px 18px;
+            z-index: 100;
+            transition: all 0.2s;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .nav-item i {
+            font-size: 24px;
+            transition: transform 0.2s;
+        }
+
+        .nav-item.active {
+            color: #3b82f6;
+            text-shadow: 0 0 8px rgba(59,130,246,0.5);
+        }
+
+        .nav-item:active i {
+            transform: scale(0.92);
+        }
+
+        .badge-icon {
+            position: absolute;
+            top: -6px;
+            right: -10px;
+            background: #ef4444;
+            border-radius: 30px;
+            padding: 2px 6px;
+            font-size: 10px;
+            font-weight: bold;
+            min-width: 18px;
+            text-align: center;
+            box-shadow: 0 0 6px rgba(239,68,68,0.6);
+        }
+
+        /* 卡片玻璃效果 */
+        .card {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(8px);
+            border-radius: 28px;
+            padding: 18px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(59, 130, 246, 0.25);
+            transition: all 0.2s;
+        }
+
+        .hero-banner {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            padding: 28px 20px;
+            border-radius: 0 0 32px 32px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #3b82f640;
+        }
+
+        .hero-title {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fbbf24, #3b82f6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 18px;
+            background: #1e293b80;
+            border-radius: 60px;
+            padding: 10px 18px;
+            font-size: 13px;
+        }
+
+        .product-card {
+            background: #0f172acc;
+            border-radius: 24px;
+            padding: 16px;
+            margin-bottom: 14px;
+            border: 1px solid #334155;
+            transition: all 0.2s;
+        }
+        .product-card:hover {
+            border-color: #3b82f6;
+            transform: translateY(-2px);
+        }
+
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .price {
+            color: #facc15;
+            font-weight: 800;
+            font-size: 20px;
+        }
+
+        .info-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 12px 0;
+            font-size: 13px;
+            color: #94a3b8;
+        }
+
+        button {
+            background: #2d3a5e;
+            border: none;
+            border-radius: 40px;
+            padding: 10px 20px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+        button.primary {
+            background: linear-gradient(95deg, #3b82f6, #2563eb);
+            box-shadow: 0 4px 12px rgba(59,130,246,0.3);
+        }
+        button:active {
+            transform: scale(0.97);
+        }
+        input, select, textarea {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 40px;
+            padding: 12px 18px;
+            color: white;
+            width: 100%;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px #3b82f640;
+        }
+        .filter-chip {
+            background: #1e293b;
+            padding: 6px 18px;
+            border-radius: 40px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+        .filter-chip:active { background: #3b82f6; }
+        .status-badge {
+            padding: 4px 14px;
+            border-radius: 40px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        .status-active { background: #10b981; }
+        .status-pending { background: #f59e0b; }
+        .status-rented { background: #3b82f6; }
+        .tabs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+        .tab {
+            background: #1e293b;
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .tab.active { background: #3b82f6; }
+        .chat-messages {
+            max-height: 420px;
+            overflow-y: auto;
+            background: #0f172a;
+            border-radius: 24px;
+            padding: 14px;
+            margin: 12px 0;
+        }
+        .message {
+            margin-bottom: 12px;
+            padding: 10px 14px;
+            border-radius: 20px;
+            max-width: 85%;
+            word-wrap: break-word;
+        }
+        .message.sent {
+            background: #3b82f6;
+            margin-left: auto;
+            text-align: right;
+        }
+        .message.received {
+            background: #1e293b;
+        }
+        .chat-input {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+        }
+        .loading-spinner {
+            text-align: center;
+            padding: 30px;
+            color: #94a3b8;
+        }
+        .glass-btn {
+            background: rgba(59,130,246,0.2);
+            backdrop-filter: blur(4px);
+        }
+        .settlement-form-card {
+            background: #0f172a;
+            border-radius: 20px;
+            padding: 16px;
+            margin: 12px 0;
+            border-left: 4px solid #f97316;
+        }
+        button.danger {
+            background: #dc2626;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+        .animate-in {
+            animation: fadeIn 0.2s ease-out;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<div class="app-container" id="app"></div>
+<script type="module">
+    // ====================== SUPABASE 配置 ======================
+    const SUPABASE_URL = 'https://oxtwdbpfneyefzsnyncx.supabase.co';      // 替换为你的 Supabase URL
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im94dHdkYnBmbmV5ZWZ6c255bmN4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzNjgwMTIsImV4cCI6MjA5MDk0NDAxMn0.nbXaQ-uKF-WfvLuxOC1rRQr_bOqBhnpG-w6V6K2HuPY';                   // 替换为你的 anon key
+    // 如果未配置则提示，实际部署前请替换
+    window.supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
+    // 辅助工具函数
+    function computeRentAmount(hafee, ratio) { return Math.floor(hafee / (ratio * 10000)); }
+    function computeActualIncome(rentAmount) { return Math.floor(rentAmount * 0.95); }
+    function computeRemainingDays(totalHafee, usedHafee) { return Math.max(0, Math.ceil(totalHafee / 20000000) - Math.ceil(usedHafee / 20000000)); }
+    
+    // ---------- 全局状态 ----------
+    let currentUser = null;
+    let currentTab = "home";
+    let currentChatRoomId = null;
+    let orderTimeoutInterval = null;
+    
+    // ---------- 数据库操作封装 (替代原 store) ----------
+    const db = {
+        async getUsers() { const {data} = await supabaseClient.from('users').select('*'); return data || []; },
+        async getRentals() { const {data} = await supabaseClient.from('rentals').select('*'); return data || []; },
+        async getOrders() { const {data} = await supabaseClient.from('orders').select('*'); return data || []; },
+        async getChatRooms() { const {data} = await supabaseClient.from('chat_rooms').select('*'); return data || []; },
+        async getMessages() { const {data} = await supabaseClient.from('messages').select('*').order('timestamp', {ascending: true}); return data || []; },
+        async saveUser(user) { await supabaseClient.from('users').upsert(user); },
+        async saveRental(rental) { await supabaseClient.from('rentals').upsert(rental); },
+        async saveOrder(order) { await supabaseClient.from('orders').upsert(order); },
+        async saveChatRoom(room) { await supabaseClient.from('chat_rooms').upsert(room); },
+        async saveMessage(msg) { await supabaseClient.from('messages').insert(msg); },
+        async updateRental(id, updates) { await supabaseClient.from('rentals').update(updates).eq('id', id); },
+        async updateOrder(id, updates) { await supabaseClient.from('orders').update(updates).eq('id', id); }
+    };
+    
+    // 初始化 Mock 数据 (仅首次)
+    async function initMockDataIfNeeded() {
+        const users = await db.getUsers();
+        if(users.length === 0) {
+            await db.saveUser({ id: "admin1", phone: "13800000000", password: "admin123", role: "admin", nickname: "三角洲管理" });
+            await db.saveUser({ id: "user1", phone: "18888888888", password: "123456", role: "user", nickname: "战神租客" });
+            await db.saveUser({ id: "user2", phone: "13912345678", password: "123456", role: "user", nickname: "雇佣兵" });
+        }
+        const rentals = await db.getRentals();
+        if(rentals.length === 0) {
+            const r1 = { id: "r1001", ownerId: "user1", ownerPhone: "18888888888", title: "Steam 巅峰战神", status: "active", gameInfo: { platform: "steam", level: 55, hafee: 32000000, safeBox: "9格", rank: "三角洲巅峰", kd: 3.2, loginMethod: "账号密码", onlineTimeRange: "全天", deposit: 300, ratio: 38, rentAmount: 0, actualIncome: 0 }, createdAt: new Date().toISOString() };
+            const r2 = { id: "r1002", ownerId: "user2", ownerPhone: "13912345678", title: "QQ区 黑鹰号", status: "active", gameInfo: { platform: "qq", level: 42, hafee: 15000000, safeBox: "6格", rank: "黑鹰", kd: 1.8, loginMethod: "扫码", onlineTimeRange: "18:00-24:00", deposit: 200, ratio: 35, rentAmount: 0, actualIncome: 0 }, createdAt: new Date().toISOString() };
+            [r1, r2].forEach(r => { r.gameInfo.rentAmount = computeRentAmount(r.gameInfo.hafee, r.gameInfo.ratio); r.gameInfo.actualIncome = computeActualIncome(r.gameInfo.rentAmount); });
+            await db.saveRental(r1); await db.saveRental(r2);
+        }
+    }
+    
+    // 检查未支付订单超时 (10分钟)
+    async function checkExpiredOrders() {
+        const orders = await db.getOrders();
+        const now = new Date();
+        for(let ord of orders) {
+            if(ord.status === 'unpaid') {
+                const createdAt = new Date(ord.createdAt);
+                if(now - createdAt > 10 * 60 * 1000) {
+                    ord.status = 'cancelled';
+                    await db.updateOrder(ord.id, { status: 'cancelled' });
+                    const rental = (await db.getRentals()).find(r => r.id === ord.rentalId);
+                    if(rental && rental.status === 'rented') {
+                        await db.updateRental(rental.id, { status: 'active' });
+                    }
+                }
+            }
+        }
+    }
+    
+    // 渲染主入口
+    async function render() {
+        if(!currentUser) {
+            await renderLogin();
+            return;
+        }
+        const appDiv = document.getElementById("app");
+        appDiv.innerHTML = `<div style="padding-bottom:70px;"><div id="tabContent" style="padding:0 14px;"></div></div>`;
+        const contentDiv = document.getElementById("tabContent");
+        const unreadCount = await computeUnreadCount();
+        const navBar = renderNavbar(currentTab, (tab) => { currentTab = tab; currentChatRoomId = null; render(); }, unreadCount);
+        appDiv.appendChild(navBar);
+        if(currentTab === "home") await renderHome(contentDiv);
+        else if(currentTab === "publish") await renderPublish(contentDiv);
+        else if(currentTab === "chat") {
+            if(currentChatRoomId) await renderChatRoom(currentChatRoomId, () => { currentChatRoomId = null; render(); });
+            else await renderChatList(contentDiv, (roomId) => { currentChatRoomId = roomId; render(); });
+        } else if(currentTab === "profile") await renderProfile(contentDiv, () => render(), (roomId) => { currentChatRoomId = roomId; currentTab = "chat"; render(); });
+    }
+    
+    // 导航栏组件
+    function renderNavbar(tab, setTab, unread) {
+        const div = document.createElement('div'); div.className = 'bottom-nav';
+        div.innerHTML = `
+            <div class="nav-item ${tab==='home'?'active':''}" data-tab="home"><i class="fas fa-home"></i><span>首页</span></div>
+            <div class="nav-item ${tab==='publish'?'active':''}" data-tab="publish"><i class="fas fa-plus-circle"></i><span>上架</span></div>
+            <div class="nav-item ${tab==='chat'?'active':''}" data-tab="chat"><i class="fas fa-comment-dots"></i><span>消息</span>${unread>0?`<span class="badge-icon">${unread}</span>`:''}</div>
+            <div class="nav-item ${tab==='profile'?'active':''}" data-tab="profile"><i class="fas fa-user"></i><span>我的</span></div>
+        `;
+        div.querySelectorAll('.nav-item').forEach(el => el.addEventListener('click', () => setTab(el.dataset.tab)));
+        return div;
+    }
+    async function computeUnreadCount() {
+        if(!currentUser) return 0;
+        const rooms = await db.getChatRooms(); const messages = await db.getMessages();
+        const userRooms = rooms.filter(r => r.participantIds?.includes(currentUser.id));
+        return messages.filter(m => userRooms.some(r=>r.id===m.roomId) && m.receiverId === currentUser.id && !m.read).length;
+    }
+    
+    // 登录页
+    async function renderLogin() {
+        const appDiv = document.getElementById("app");
+        appDiv.innerHTML = `<div style="padding:40px 24px;"><div style="text-align:center;margin-bottom:40px;"><div style="font-size:42px;font-weight:800;background:linear-gradient(135deg,#FFD966,#3b82f6);-webkit-background-clip:text;background-clip:text;color:transparent;">三角洲租号</div><p style="color:#8f9bb3;">安全交易 · 极速租号</p></div><div class="card"><input type="tel" id="loginPhone" placeholder="手机号" style="margin-bottom:16px;"><input type="password" id="loginPassword" placeholder="密码" style="margin-bottom:24px;"><button id="doLoginBtn" class="primary" style="width:100%;">登录</button><div style="text-align:center;margin-top:20px;"><span id="toRegisterBtn" style="color:#3b82f6;cursor:pointer;">注册账号</span></div><div id="authError" style="color:#f97316;margin-top:12px;"></div></div></div>`;
+        document.getElementById("doLoginBtn")?.addEventListener("click", async () => {
+            const phone = document.getElementById("loginPhone").value.trim();
+            const pwd = document.getElementById("loginPassword").value;
+            const users = await db.getUsers();
+            const user = users.find(u => u.phone === phone && u.password === pwd);
+            if(user) { currentUser = { id: user.id, phone: user.phone, role: user.role, nickname: user.nickname }; render(); }
+            else document.getElementById("authError").innerText = "手机号或密码错误";
+        });
+        document.getElementById("toRegisterBtn")?.addEventListener("click", () => renderRegister());
+    }
+    async function renderRegister() {
+        const appDiv = document.getElementById("app");
+        appDiv.innerHTML = `<div style="padding:30px 20px;"><div class="card"><h3>注册新账号</h3><input type="tel" id="regPhone" placeholder="手机号"><div style="display:flex;gap:12px;margin:12px 0;"><input type="text" id="smsCode" placeholder="验证码" style="flex:1"><button id="getCodeBtn" class="glass-btn">获取验证码</button></div><input type="password" id="regPassword" placeholder="密码"><input type="text" id="regNickname" placeholder="昵称" style="margin:12px 0;"><button id="doRegBtn" class="primary" style="width:100%;">注册并登录</button><div style="margin-top:16px;text-align:center;"><span id="backLoginBtn" style="color:#3b82f6;cursor:pointer;">返回登录</span></div><div id="regError" style="color:#f97316;"></div></div></div>`;
+        let tempCode = null, tempPhone = null;
+        document.getElementById("getCodeBtn")?.addEventListener("click", () => { const phone = document.getElementById("regPhone").value.trim(); if(!/^1[3-9]\d{9}$/.test(phone)) { document.getElementById("regError").innerText = "手机号无效"; return; } tempCode = Math.floor(100000+Math.random()*900000).toString(); tempPhone = phone; alert(`验证码: ${tempCode}`); });
+        document.getElementById("doRegBtn")?.addEventListener("click", async () => { const phone = document.getElementById("regPhone").value.trim(); const code = document.getElementById("smsCode").value.trim(); const pwd = document.getElementById("regPassword").value; const nickname = document.getElementById("regNickname").value.trim() || `玩家${phone.slice(-4)}`; if(!phone || !pwd) return; if(tempCode !== code || tempPhone !== phone) { document.getElementById("regError").innerText = "验证码错误"; return; } const users = await db.getUsers(); if(users.find(u=>u.phone===phone)) { document.getElementById("regError").innerText = "手机号已注册"; return; } const newUser = { id: "u_"+Date.now(), phone, password: pwd, role: "user", nickname }; await db.saveUser(newUser); currentUser = { id: newUser.id, phone, role: "user", nickname }; render(); });
+        document.getElementById("backLoginBtn")?.addEventListener("click", () => renderLogin());
+    }
+    
+    // 首页 + 筛选
+    let filterPlatform = null, filterRatioRange = null, filterSafeBox = null;
+    async function renderHome(container) {
+        let rentals = await db.getRentals(); rentals = rentals.filter(r => r.status === "active");
+        if(filterPlatform) rentals = rentals.filter(r => r.gameInfo.platform === filterPlatform);
+        if(filterRatioRange) { let [a,b] = filterRatioRange.split('~'); rentals = rentals.filter(r => r.gameInfo.ratio >= a && r.gameInfo.ratio <= b); }
+        if(filterSafeBox) rentals = rentals.filter(r => r.gameInfo.safeBox === filterSafeBox);
+        container.innerHTML = `<div class="hero-banner"><div class="hero-title">问鼎巅峰 行业最优</div><div class="stats-row"><span><i class="fas fa-check-circle"></i> 安全交易 487K笔</span><span><i class="fas fa-gamepad"></i> 在售商品 ${(await db.getRentals()).filter(r=>r.status==="active").length}</span></div></div><div class="card"><div class="filter-group"><div class="filter-label" id="togglePlatform"><i class="fas fa-server"></i> 区服 <span id="pfLabel">${filterPlatform||'全部'}</span></div><div id="platformOptions" class="filter-options" style="display:none;"><span class="filter-chip" data-platform="all">全部</span><span data-platform="steam">Steam</span><span data-platform="qq">QQ区</span><span data-platform="wechat">微信区</span></div></div><div class="filter-group"><div class="filter-label" id="toggleRatio"><i class="fas fa-chart-line"></i> 比例 <span id="ratioLabel">${filterRatioRange||'全部'}</span></div><div id="ratioOptions" class="filter-options" style="display:none;"><span data-ratio="all">全部</span><span data-ratio="30~32">30~32</span><span data-ratio="33~35">33~35</span><span data-ratio="36~38">36~38</span><span data-ratio="39~41">39~41</span><span data-ratio="42~43">42~43</span><span data-ratio="44~45">44~45</span></div></div><div class="filter-group"><div class="filter-label" id="toggleSafeBox"><i class="fas fa-box"></i> 安全箱 <span id="sbLabel">${filterSafeBox||'全部'}</span></div><div id="safeBoxOptions" class="filter-options" style="display:none;"><span data-safebox="all">全部</span><span data-safebox="2格">2格</span><span data-safebox="4格">4格</span><span data-safebox="6格">6格</span><span data-safebox="9格">9格</span></div></div></div><div id="rentalList"></div>`;
+        const listDiv = container.querySelector("#rentalList");
+        if(rentals.length===0) listDiv.innerHTML = '<div class="card">暂无账号</div>';
+        else listDiv.innerHTML = rentals.map(r => `<div class="product-card"><div class="flex-between"><span class="platform-badge">${r.gameInfo.platform.toUpperCase()} Lv${r.gameInfo.level}</span><span class="price">¥${r.gameInfo.rentAmount}</span></div><div class="info-grid"><span>📦 ${r.gameInfo.safeBox}</span><span>🎖️ ${r.gameInfo.rank}</span><span>⚔️ KD ${r.gameInfo.kd}</span><span>💎 ${(r.gameInfo.hafee/10000).toFixed(0)}w</span><span>📊 比例 ${r.gameInfo.ratio}</span><span>🔐 ${r.gameInfo.loginMethod}</span></div><button class="rentNowBtn primary" data-id="${r.id}" data-deposit="${r.gameInfo.deposit}" data-rent="${r.gameInfo.rentAmount}" style="margin-top:12px; width:100%;">立即租用 (总¥${r.gameInfo.deposit + r.gameInfo.rentAmount})</button></div>`).join('');
+        document.querySelectorAll('.rentNowBtn').forEach(btn => btn.addEventListener('click', async (e) => { const rentalId = btn.dataset.id; const rental = (await db.getRentals()).find(r=>r.id===rentalId); if(!rental) return; if(currentUser.id === rental.ownerId) return alert("不能租自己的号"); const total = rental.gameInfo.deposit + rental.gameInfo.rentAmount; const newOrder = { id: "ord"+Date.now()+Math.random(), rentalId, renterId: currentUser.id, ownerId: rental.ownerId, status: "unpaid", totalAmount: total, deposit: rental.gameInfo.deposit, rentAmount: rental.gameInfo.rentAmount, totalHafee: rental.gameInfo.hafee, usedHafee: 0, createdAt: new Date().toISOString() }; await db.saveOrder(newOrder); alert(`订单创建成功，请在10分钟内支付`); render(); }));
+        // 筛选折叠逻辑
+        document.getElementById("togglePlatform")?.addEventListener("click",()=>{let o=document.getElementById("platformOptions"); o.style.display=o.style.display==="none"?"flex":"none";});
+        document.getElementById("toggleRatio")?.addEventListener("click",()=>{let o=document.getElementById("ratioOptions"); o.style.display=o.style.display==="none"?"flex":"none";});
+        document.getElementById("toggleSafeBox")?.addEventListener("click",()=>{let o=document.getElementById("safeBoxOptions"); o.style.display=o.style.display==="none"?"flex":"none";});
+        document.querySelectorAll('[data-platform]').forEach(el=>el.addEventListener("click",()=>{filterPlatform=el.dataset.platform==="all"?null:el.dataset.platform; render();}));
+        document.querySelectorAll('[data-ratio]').forEach(el=>el.addEventListener("click",()=>{filterRatioRange=el.dataset.ratio==="all"?null:el.dataset.ratio; render();}));
+        document.querySelectorAll('[data-safebox]').forEach(el=>el.addEventListener("click",()=>{filterSafeBox=el.dataset.safebox==="all"?null:el.dataset.safebox; render();}));
+    }
+    
+    // 发布页
+    async function renderPublish(container) {
+        container.innerHTML = `<div class="card"><h3>发布出租</h3><div class="form-row"><label>区服</label><select id="pubPlatform"><option value="steam">Steam</option><option value="qq">QQ</option><option value="wechat">微信</option></select></div><div class="form-row"><label>哈弗币(≥1000w)</label><input id="pubHafee" value="15000000"></div><div class="form-row"><label>比例(30-45)</label><input id="pubRatio" value="35"></div><div class="form-row"><label>押金(≥150)</label><input id="pubDeposit" value="200"></div><div class="form-row"><label>KD(≤5)</label><input id="pubKd" value="1.5"></div><div class="form-row"><label>安全箱</label><select id="pubSafeBox"><option>2格</option><option>4格</option><option>6格</option><option>9格</option></select></div><button id="submitRentalBtn" class="primary">提交审核</button></div>`;
+        document.getElementById("submitRentalBtn")?.addEventListener("click", async () => { let hafee = parseInt(document.getElementById("pubHafee").value); let ratio = parseInt(document.getElementById("pubRatio").value); let deposit = parseInt(document.getElementById("pubDeposit").value); let kd = parseFloat(document.getElementById("pubKd").value); if(hafee<10000000 || ratio<30||ratio>45||deposit<150||kd>5) { alert("数据不符合要求"); return; } const rentAmount = computeRentAmount(hafee, ratio); const newRental = { id: "r"+Date.now(), ownerId: currentUser.id, ownerPhone: currentUser.phone, title: `${document.getElementById("pubPlatform").value} 账号`, status: "pending", gameInfo: { platform: document.getElementById("pubPlatform").value, level: 40, hafee, safeBox: document.getElementById("pubSafeBox").value, rank: "黑鹰", kd, loginMethod: "扫码", onlineTimeRange: "全天", deposit, ratio, rentAmount, actualIncome: computeActualIncome(rentAmount) }, createdAt: new Date().toISOString() }; await db.saveRental(newRental); alert("已提交审核"); render(); });
+    }
+    
+    // 聊天列表 & 房间 (修复结单表单动态)
+    async function renderChatList(container, openRoom) {
+        const rooms = await db.getChatRooms(); const userRooms = rooms.filter(r => r.participantIds?.includes(currentUser.id));
+        container.innerHTML = `<div class="card"><h3>消息</h3><div id="roomsList"></div></div>`;
+        const listDiv = container.querySelector("#roomsList");
+        if(userRooms.length===0) listDiv.innerHTML = "<div>暂无聊天</div>";
+        else listDiv.innerHTML = userRooms.map(room => `<div class="product-card" data-room="${room.id}" style="cursor:pointer;"><div><i class="fas fa-comment"></i> 订单 ${room.orderId?.slice(-6)}</div></div>`).join('');
+        document.querySelectorAll('[data-room]').forEach(el => el.addEventListener('click', () => openRoom(el.dataset.room)));
+    }
+    
+    async function renderChatRoom(roomId, onBack) {
+        const room = (await db.getChatRooms()).find(r => r.id === roomId);
+        if(!room) return onBack();
+        const order = (await db.getOrders()).find(o => o.id === room.orderId);
+        let messages = await db.getMessages(); messages = messages.filter(m => m.roomId === roomId);
+        const appDiv = document.getElementById("app");
+        const isSeller = order && order.ownerId === currentUser.id;
+        const isBuyer = order && order.renterId === currentUser.id;
+        const canRequestSettlement = (order && order.status === 'rented' && isBuyer);
+        const hasPendingReport = order?.usageReport?.submitted && !order.usageReport?.confirmed;
+        const showReportToBuyer = hasPendingReport && isBuyer;
+        appDiv.innerHTML = `<div style="padding:12px; height:100vh; display:flex; flex-direction:column;"><div class="flex-between"><button id="backBtn" class="glass-btn"><i class="fas fa-arrow-left"></i> 返回</button><span>聊天室</span>${canRequestSettlement ? `<button id="requestSettlementBtn" class="small primary">提前结单</button>` : ''}</div><div id="dynamicSettlementArea"></div><div class="chat-messages" id="chatMessages"></div><div class="chat-input"><input type="text" id="msgInput" placeholder="消息..."><button id="sendMsgBtn">发送</button></div></div>`;
+        const msgsDiv = document.getElementById("chatMessages");
+        msgsDiv.innerHTML = messages.map(m => `<div class="message ${m.senderId === currentUser.id ? 'sent' : 'received'}">${m.text}<div style="font-size:10px;">${new Date(m.timestamp).toLocaleTimeString()}</div></div>`).join('');
+        msgsDiv.scrollTop = msgsDiv.scrollHeight;
+        // 动态处理结单表单区域
+        const settlementArea = document.getElementById("dynamicSettlementArea");
+        if(order?.settlementRequested && !order.usageReport?.submitted && isSeller) {
+            settlementArea.innerHTML = `<div class="settlement-form-card"><div class="flex-between"><b>📋 买家申请结单</b><button id="showFormBtn" class="small">填写使用报告</button></div><div id="reportFormContainer" style="display:none; margin-top:12px;"></div></div>`;
+            document.getElementById("showFormBtn")?.addEventListener("click", () => {
+                const formDiv = document.getElementById("reportFormContainer");
+                formDiv.style.display = "block";
+                formDiv.innerHTML = `<input id="usedHafeeReport" placeholder="哈弗币使用量" value="${order.usedHafee||0}"><input id="experienceCard" placeholder="体验卡"><input id="sixHead" placeholder="六头"><input id="sixArmor" placeholder="六甲"><input id="awBullet" placeholder="AW子弹"><input id="sixBullet" placeholder="六级弹"><input id="fullArmor" placeholder="全装包"><button id="submitReportFinal" class="primary" style="margin-top:8px;">提交报告</button>`;
+                document.getElementById("submitReportFinal")?.addEventListener("click", async () => {
+                    const report = { usedHafee: parseInt(document.getElementById("usedHafeeReport").value), experienceCard: document.getElementById("experienceCard").value, sixHead: document.getElementById("sixHead").value, sixArmor: document.getElementById("sixArmor").value, awBullet: document.getElementById("awBullet").value, sixBullet: document.getElementById("sixBullet").value, fullArmor: document.getElementById("fullArmor").value, submitted: true, confirmed: false };
+                    await db.updateOrder(order.id, { usageReport: report, settlementRequested: false });
+                    await db.saveMessage({ id: "msg"+Date.now(), roomId, senderId: currentUser.id, receiverId: order.renterId, text: "卖家已提交使用报告，请确认结单", timestamp: new Date().toISOString(), read: false });
+                    renderChatRoom(roomId, onBack);
+                });
+            });
+        }
+        if(showReportToBuyer) {
+            settlementArea.innerHTML = `<div class="settlement-form-card"><h4>卖家提交的使用报告</h4><div>哈弗币: ${order.usageReport.usedHafee}</div><div>体验卡: ${order.usageReport.experienceCard}</div><div>六头: ${order.usageReport.sixHead}</div><div>六甲: ${order.usageReport.sixArmor}</div><button id="confirmFinalBtn" class="primary">确认结单</button></div>`;
+            document.getElementById("confirmFinalBtn")?.addEventListener("click", async () => { order.usageReport.confirmed = true; await db.updateOrder(order.id, { status: "completed", usageReport: order.usageReport }); const rental = (await db.getRentals()).find(r => r.id === order.rentalId); if(rental) await db.updateRental(rental.id, { status: "active" }); alert("结单完成"); onBack(); });
+        }
+        document.getElementById("requestSettlementBtn")?.addEventListener("click", async () => { await db.updateOrder(order.id, { settlementRequested: true }); await db.saveMessage({ id: "msg"+Date.now(), roomId, senderId: currentUser.id, receiverId: order.ownerId, text: "买家申请提前结单，请填写使用报告", timestamp: new Date().toISOString(), read: false }); renderChatRoom(roomId, onBack); });
+        document.getElementById("sendMsgBtn")?.addEventListener("click", async () => { const text = document.getElementById("msgInput").value.trim(); if(!text) return; const otherId = room.participantIds.find(id=>id!==currentUser.id); await db.saveMessage({ id: "msg"+Date.now(), roomId, senderId: currentUser.id, receiverId: otherId, text, timestamp: new Date().toISOString(), read: false }); renderChatRoom(roomId, onBack); });
+        document.getElementById("backBtn")?.addEventListener("click", () => onBack());
+    }
+    
+    // 个人中心 + 售后
+    async function renderProfile(container, onRerender, openChat) {
+        const isAdmin = currentUser.role === "admin";
+        const myRentals = (await db.getRentals()).filter(r => r.ownerId === currentUser.id);
+        const myOrders = (await db.getOrders()).filter(o => o.renterId === currentUser.id);
+        container.innerHTML = `<div class="card"><div><i class="fas fa-user-circle"></i> ${currentUser.nickname}</div></div>
+        <div class="card"><h3>我的出租</h3><div id="myRentalsList"></div></div>
+        <div class="card"><h3>我的租号</h3><div id="myOrdersList"></div></div>
+        ${isAdmin ? `<div class="card"><h3>🔧 管理订单</h3><div id="adminOrders"></div></div>` : ''}
+        <button id="logoutBtn" style="background:#334155;">退出登录</button>`;
+        const rentDiv = document.getElementById("myRentalsList");
+        rentDiv.innerHTML = myRentals.map(r => `<div class="product-card"><div>${r.title} - ${r.status}</div><div>租金¥${r.gameInfo.rentAmount}</div></div>`).join('');
+        const ordersDiv = document.getElementById("myOrdersList");
+        ordersDiv.innerHTML = myOrders.map(o => `<div class="product-card"><div>订单${o.id.slice(-6)} 状态:${o.status}</div><div>总金额¥${o.totalAmount}</div>${o.status === 'rented' ? `<button class="afterSaleBtn primary small" data-id="${o.id}">申请售后</button>` : ''}</div>`).join('');
+        document.querySelectorAll('.afterSaleBtn').forEach(btn => btn.addEventListener("click", async () => { const orderId = btn.dataset.id; const reason = prompt("请填写售后原因"); if(reason) { await db.saveMessage({ id: "amsg"+Date.now(), roomId: "system", senderId: currentUser.id, receiverId: "admin1", text: `售后申请 订单${orderId}: ${reason}`, timestamp: new Date().toISOString(), read: false }); alert("已提交售后, 管理员会联系您"); } }));
+        if(isAdmin) {
+            const allOrders = await db.getOrders(); const adminDiv = document.getElementById("adminOrders");
+            adminDiv.innerHTML = allOrders.map(o => `<div class="product-card">订单${o.id.slice(-6)} 状态${o.status} <button class="forceEndBtn small" data-id="${o.id}">强制结单</button></div>`).join('');
+            document.querySelectorAll('.forceEndBtn').forEach(btn => btn.addEventListener("click", async () => { const oid = btn.dataset.id; await db.updateOrder(oid, { status: "completed" }); const ord = allOrders.find(o=>o.id===oid); if(ord) { const rental = (await db.getRentals()).find(r=>r.id===ord.rentalId); if(rental) await db.updateRental(rental.id,{status:"active"}); } alert("强制结单"); onRerender(); }));
+        }
+        document.getElementById("logoutBtn")?.addEventListener("click", () => { currentUser = null; render(); });
+    }
+    
+    // 启动
+    await initMockDataIfNeeded();
+    setInterval(checkExpiredOrders, 30000);
+    await render();
+</script>
+</body>
+</html>
